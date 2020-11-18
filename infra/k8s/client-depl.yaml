@@ -15,7 +15,6 @@ spec:
       containers:
         - name: client
           image: nayanika2304/client
-
 ---
 apiVersion: v1
 kind: Service
