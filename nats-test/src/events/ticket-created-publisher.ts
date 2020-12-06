@@ -1,9 +1,9 @@
-import {Message} from "node-nats-streaming";
-import {Listener} from "../../../common/src/events/base-listener";
+import {Publisher} from "../../../common/src/events/base-publisher";
 import {TicketCreatedEvent} from "../../../common/src/events/ticket-created-event";
 import {Subjects} from "../../../common/src/events/subjects";
+import {Message} from "node-nats-streaming";
 
-export class TicketCreatedListener extends Listener<TicketCreatedEvent>{
+export class TicketCreatedPublisher extends Publisher<TicketCreatedEvent>{
     readonly subject = Subjects.TicketCreated;
     queueGroupName = 'payments-service';
 
@@ -12,4 +12,5 @@ export class TicketCreatedListener extends Listener<TicketCreatedEvent>{
 
         msg.ack()
     }
+
 }
