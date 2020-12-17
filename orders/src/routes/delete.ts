@@ -1,6 +1,9 @@
 import express , {Request, Response} from  'express';
 import {NotAuthorizedError, NotFoundError, requireAuth} from "@nayanika-test/common";
 import {OrderStatus, Order} from '../models/order'
+import {OrderCancelledPublisher} from "../publishers/order-cancelled-publisher";
+import {natsWrapper} from "../nats-wrapper";
+
 const router = express.Router()
 
 router.delete('/api/orders/:orderId',requireAuth,async(req:Request,res:Response) =>{
@@ -18,7 +21,12 @@ router.delete('/api/orders/:orderId',requireAuth,async(req:Request,res:Response)
     await order.save();
 
     //publishing an event saying this was cancelled!
-
+    new OrderCancelledPublisher(natsWrapper.client).publish({
+        id: order.id,
+        ticket: {
+            id: order.ticket.id
+        }
+    })
     res.status(204).send(order)
 })
 
