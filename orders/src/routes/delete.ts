@@ -3,7 +3,7 @@ import {NotAuthorizedError, NotFoundError, requireAuth} from "@nayanika-test/com
 import {OrderStatus, Order} from '../models/order'
 import {OrderCancelledPublisher} from "../publishers/order-cancelled-publisher";
 import {natsWrapper} from "../nats-wrapper";
-
+import mongoose from "mongoose";
 const router = express.Router()
 
 router.delete('/api/orders/:orderId',requireAuth,async(req:Request,res:Response) =>{
@@ -22,6 +22,7 @@ router.delete('/api/orders/:orderId',requireAuth,async(req:Request,res:Response)
 
     //publishing an event saying this was cancelled!
     new OrderCancelledPublisher(natsWrapper.client).publish({
+        version : order.version,
         id: order.id,
         ticket: {
             id: order.ticket.id

@@ -14,3 +14,5 @@ export class TicketUpdatedPublisher extends Publisher<TicketUpdatedEvent>{
 }
 
 
+
+
