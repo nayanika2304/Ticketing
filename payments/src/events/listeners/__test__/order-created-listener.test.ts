@@ -28,7 +28,6 @@ const setup = async () => {
   return { listener, data, msg };
 };
 
-/*
 it('replicates the order info', async () => {
   const { listener, data, msg } = await setup();
 
@@ -46,4 +45,3 @@ it('acks the message', async () => {
 
   expect(msg.ack).toHaveBeenCalled();
 });
-*/
