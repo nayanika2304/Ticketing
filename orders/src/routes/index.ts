@@ -1,15 +1,15 @@
-import express , {Request, Response} from  'express';
-import {requireAuth} from "@nayanika-test/common";
-import {Order} from '../models/order'
-const router = express.Router()
+import express, { Request, Response } from 'express';
+import { requireAuth } from '@nayanika-test/common';
+import { Order } from '../models/order';
 
-router.get('/api/orders',requireAuth,async(req:Request,res:Response) =>{
-    const orders = await Order.find({
-        userId: req.currentUser!.id
-    }).populate('ticket') // simultaneously load the ticket associated with it
+const router = express.Router();
 
-    res.send(orders)
+router.get('/api/orders', requireAuth, async (req: Request, res: Response) => {
+  const orders = await Order.find({
+    userId: req.currentUser!.id,
+  }).populate('ticket');
 
-})
+  res.send(orders);
+});
 
-export {router as indexOrderRouter} ;
+export { router as indexOrderRouter };

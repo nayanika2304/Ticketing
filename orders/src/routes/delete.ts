@@ -1,34 +1,43 @@
-import express , {Request, Response} from  'express';
-import {NotAuthorizedError, NotFoundError, requireAuth} from "@nayanika-test/common";
-import {OrderStatus, Order} from '../models/order'
-import {OrderCancelledPublisher} from "../publishers/order-cancelled-publisher";
-import {natsWrapper} from "../nats-wrapper";
-import mongoose from "mongoose";
-const router = express.Router()
+import express, { Request, Response } from 'express';
+import {
+  requireAuth,
+  NotFoundError,
+  NotAuthorizedError,
+} from '@nayanika-test/common';
+import { Order, OrderStatus } from '../models/order';
+import { OrderCancelledPublisher } from '../events/publishers/order-cancelled-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
-router.delete('/api/orders/:orderId',requireAuth,async(req:Request,res:Response) =>{
-    const {orderId} = req.params;
+const router = express.Router();
 
-    const order = await Order.findById(orderId)
-    if(!order) {
-        throw new NotFoundError()
+router.delete(
+  '/api/orders/:orderId',
+  requireAuth,
+  async (req: Request, res: Response) => {
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId).populate('ticket');
+
+    if (!order) {
+      throw new NotFoundError();
     }
-    if(order.userId !== req.currentUser!.id){
-        throw new NotAuthorizedError()
+    if (order.userId !== req.currentUser!.id) {
+      throw new NotAuthorizedError();
     }
-
-    order.status = OrderStatus.Cancelled
+    order.status = OrderStatus.Cancelled;
     await order.save();
 
-    //publishing an event saying this was cancelled!
+    // publishing an event saying this was cancelled!
     new OrderCancelledPublisher(natsWrapper.client).publish({
-        version : order.version,
-        id: order.id,
-        ticket: {
-            id: order.ticket.id
-        }
-    })
-    res.status(204).send(order)
-})
+      id: order.id,
+      version: order.version,
+      ticket: {
+        id: order.ticket.id,
+      },
+    });
 
-export {router as deleteOrderRouter} ;
+    res.status(204).send(order);
+  }
+);
+
+export { router as deleteOrderRouter };
