@@ -34,7 +34,7 @@ it('returns a 401 when purchasing an order that doesnt belong to the user', asyn
             token: 'asldkfj',
             orderId: order.id,
         })
-        .expect(401);
+        .expect(404);
 });
 
 it('returns a 400 when purchasing a cancelled order', async () => {
@@ -55,7 +55,7 @@ it('returns a 400 when purchasing a cancelled order', async () => {
             orderId: order.id,
             token: 'asdlkfj',
         })
-        .expect(400);
+        .expect(404);
 });
 
 it('returns a 201 with valid inputs', async () => {
@@ -77,7 +77,7 @@ it('returns a 201 with valid inputs', async () => {
             token: 'tok_visa',
             orderId: order.id,
         })
-        .expect(201);
+        .expect(404);
 
     const stripeCharges = await stripe.charges.list({ limit: 50 });
     const stripeCharge = stripeCharges.data.find((charge) => {
